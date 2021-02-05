@@ -57,6 +57,7 @@ public class Product implements Serializable {
     @Override
     public String toString() {
         System.out.println("我这个是在dev分支上面的改动");
+        System.out.println("这个是我在github上面添加的内容");
         return "Product{" +
                 "productId=" + productId +
                 ", productName='" + productName + '\'' +
