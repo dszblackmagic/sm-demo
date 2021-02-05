@@ -56,6 +56,7 @@ public class Product implements Serializable {
 
     @Override
     public String toString() {
+        System.out.println("this is update");
         return "Product{" +
                 "productId=" + productId +
                 ", productName='" + productName + '\'' +
