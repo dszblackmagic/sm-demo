@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--扫描注解-->
+    <context:component-scan base-package="cn.sm" />
+    <!--加载配置文件-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <!--@Controller  @Service...-->
+    <!--数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!-- 我们的spring要去配置相关的工厂bean-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 1.name这个dataSource -->
+        <property name="dataSource" ref="dataSource" />
+        <!--2. 引入映射文件的位置-->
+        <property name="mapperLocations" value="classpath:mapper/*Mapper.xml" />
+    </bean>
+
+    <!--配置sqlSession会话 多例-->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
+        <constructor-arg index="0" ref="sqlSessionFactory" />
+    </bean>
+
+<!--    <bean id="productDaoImpl" class="cn.sm.dao.ProductDaoImpl">-->
+<!--        <property name="sqlSession" ref="sqlSession"/>-->
+<!--    </bean>-->
+
+
+    <!-- 想要让spring来动态生成mybatis代理接口, 就要去配置mybatis-spring给我们提供的一个类
+            MapperScannerConfigurer
+    -->
+    <!--让spring生成mapper接口代理实现类-->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--传入工厂-->
+        <!-- sqlSessionFactoryBeanName ， 后面跟的是value 不是ref-->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!--扫描包哪些包下的接口-->
+        <property name="basePackage" value="cn.sm.dao"/>
+    </bean>
+
+
+
+    <!--配置事务bean类 -->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- aop注解生效 -->
+    <aop:aspectj-autoproxy/>
+    <tx:annotation-driven transaction-manager="txManager"/>
+</beans>

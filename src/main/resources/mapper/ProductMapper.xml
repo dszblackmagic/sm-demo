@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace这个名字决定了我们要怎么找到它-->
+<mapper namespace="cn.sm.dao.ProductDao">
+<!-- pull -->
+    <!--type是所要映射的那个实体类-->
+    <!-- 结果集映射可以解决
+    1.数据库字段和实体类字段不匹配的问题
+    2.还可以实现多表关联查询的高级结果返回配置
+    -->
+    <resultMap id="productMap" type="cn.sm.entity.Product">
+        <id column="product_id" property="productId"></id>
+        <result column="product_name" property="productName" />
+        <result column="product_price" property="productPrice" />
+        <result column="product_description" property="productDescription" />
+    </resultMap>
+    <select id="getById" parameterType="java.lang.Integer" resultMap="productMap">
+        select
+        *
+        from product t1
+        where t1.product_id=#{id}
+    </select>
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from product where product_id=#{id}
+    </delete>
+</mapper>
